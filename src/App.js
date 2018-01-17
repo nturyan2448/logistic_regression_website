@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
-  componentDidMount () {
+  componentWillMount () {
     const script = document.createElement("script");
 
     script.src = "LR.js";
