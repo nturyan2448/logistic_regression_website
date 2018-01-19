@@ -3,14 +3,14 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
-//   componentWillMount () {
-//     const script = document.createElement("script");
+  componentDidMount () {
+    const script = document.createElement("script");
 
-//     script.src = "LR.js";
-//     script.async = true;
+    script.src = "LR.js";
+    script.async = true;
 
-//     document.body.appendChild(script);
-// }
+    document.body.appendChild(script);
+}
   render() {
     return (
       <div className="App">

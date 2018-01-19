@@ -3,16 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "babel-polyfill": "^6.23.0",
+    "body-parser": "^1.17.1",
+    "concurrently": "^3.4.0",
+    "express": "^4.15.2",
+    "isomorphic-fetch": "^2.2.1",
+    "ml-random-forest": "^1.0.2",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
   },
   "devDependencies": {
     "react-scripts": "1.1.0"
   },
+  "proxy": "http://localhost:3001/",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "node server.js"
   }
 }
