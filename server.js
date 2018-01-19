@@ -40,33 +40,14 @@ app.use(express.static(__dirname+'/build'))
 app.use(express.static(__dirname+'/public'))
 app.get('/', (req,res)=>{res.sendFile(__dirname+'/public/index.html')})
 app.get('/data', (req, res)=>{res.json(data)})
-app.post('/result', (req,res) => {
-    id+=1;
-    console.log("GET POST")
-    console.log(req.body);
-    data.push({
-        id: id,
-        name: req.body.name,
-        post: req.body.post,
-        time: req.body.time,
-        replies: []
-    })
-    console.log(data);
-    res.json(data);
+app.post('/result/lr', (req,res) => {
+    console.log("GET LOGISTIC REGRESSION RESULT")
+    // console.log(req.body);
 })
 
-app.post('/api/reply', (req,res) => {
-    console.log("GET REPLY");
-    console.log(req.body);
-    let postId = req.body.postId
-    data[postId].replies.push({
-        id: req.body.id,
-        name: req.body.name,
-        reply: req.body.reply,
-        time: req.body.time
-    })
-    console.log(data[postId]);
-    res.json(data[postId].replies);
+app.post('/result/rf', (req,res) => {
+    console.log("GET RANDOM FOREST RESULT");
+    console.log(req);
 })
 
 const port = process.env.PORT || 3001;

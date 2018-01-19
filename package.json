@@ -13,6 +13,9 @@
     "react-dom": "^15.5.4"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "ml-dataset-iris": "^1.0.0",
     "react-scripts": "1.1.0"
   },
   "proxy": "http://localhost:3001/",

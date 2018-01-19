@@ -1,5 +1,5 @@
 import IrisDataset from 'ml-dataset-iris';
-import {RandomForestClassifier as RFClassifier} from 'ml-random-forest';
+import {RandomForestClassifier} from 'ml-random-forest';
 import fetch from 'isomorphic-fetch';
 
 var trainingSet = IrisDataset.getNumbers();
@@ -14,6 +14,7 @@ var options = {
     nEstimators: 25
 };
 
-var classifier = new RFClassifier(options);
+var classifier = new RandomForestClassifier(options);
 classifier.train(trainingSet, predictions);
 var result = classifier.predict(trainingSet);
+console.log(result)
