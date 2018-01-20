@@ -18,12 +18,37 @@ var fire = firebase.initializeApp(config);
 var db = fire.database();
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      'isFree': true
+    }
+  }
+
   componentDidMount() {
-    // get training and testing data from database
-    db.ref('data').once('value').then((snapshot) => {
-      const data = snapshot.val();
-      this.LR(data);
-    });
+    setInterval(() => {
+      console.log(this.state);
+      if (this.state.isFree) {
+        console.log('checking tasks to do...');
+        db.ref('task').once('value').then((snapshot) => {
+          const taskIndex = snapshot.val().findIndex((item) => item.state === 'queued')
+          if (taskIndex !== -1) {
+            this.setState({ 'isFree': false });
+            db.ref('task/' + taskIndex).update({ 'state': 'training' });
+            db.ref('task/' + taskIndex).once('value').then((snapshot) => {
+              const { data } = snapshot.val();
+              const { model, metrics } = this.LR(data);
+              db.ref('task/' + taskIndex).update({ 
+                'state': 'done',
+                'model': model,
+                'metrics': metrics
+              });
+              this.setState({ 'isFree': true });
+            });
+          }
+        });
+      }
+    }, 5000);
   }
 
   LR(data) {
@@ -108,6 +133,11 @@ class App extends Component {
           error: error
       })
     })
+
+    return {
+      'model': w,
+      'metrics': { 'error': error }
+    }
   }
 
   RF(data) {
