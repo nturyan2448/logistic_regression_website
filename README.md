@@ -4,7 +4,7 @@ NMLAB Final Project
 ## Introduction
 
 #### Machine Learning Website: React
-將我們想要進行的machine learning任務放到雲端上，並使用連進此網站user的CPU資源來幫助我們進行machine learning。
+將我們想要進行的machine learning任務放到雲端上，並使用連進此[網站](https://nturyan2448.github.io/logistic_regression_website/)的user所擁有的瀏覽器CPU資源來幫助我們進行machine learning。
 
 #### Database: Firebase
 Database使用的是[Google Firebase](https://www.google.com.tw/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0ahUKEwjc1-Pe-ObYAhUChrwKHXB_Cw0QFggmMAA&url=https%3A%2F%2Ffirebase.google.com%2F&usg=AOvVaw3fzCjfkgyYXdUPCdS8VWFg)所提供的實時資料庫服務，搭配其javascript與python的API來進行前後端的資料儲存與交換。機器學習的任務以task包裝:主控者可以藉由上傳task到資料庫，而user在前端會自動去向資料庫取得新的task，將task接收後執行並回傳結果到資料庫。
