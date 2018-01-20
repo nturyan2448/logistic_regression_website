@@ -18,6 +18,9 @@ module.exports = {
     }, { 
       test: /\.svg$/, 
       loader: 'svg-loader' 
-    }],
+    }, {
+      test: /favicon\.ico$/,
+      loader: 'url-loader'
+    },],
   },
 };
