@@ -4,33 +4,32 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 
-def get_db():
+def initFirebase():
     cred = credentials.Certificate('mljs-9c8d3a5283c3.json')
     firebase_admin.initialize_app(cred, {
         'databaseURL': 'https://mljs-85ca7.firebaseio.com/'
     })
-    ref = db.reference('/task')  
-    return ref
 
-def reset_db():
-    db = get_db()
-    db.set(json.load(open('data.json'))['task'])
+def resetDB():
+    data = json.load(open('data.json'))
+    db.reference('/task').set(data['task'])
+    db.reference('/global').set(data['global'])
 
-def list_all_tasks():
-    db = get_db().get()
-    for i in range(len(db)):
-        task = db[i]
-        print('Task {0}: {1:>8s}'.format(
-            i, task['state']
+def listAllTasks():
+    print('TaskID  Model  Status')
+    print('========================')
+    for taskID, task in sorted(db.reference('/task').get().items()):
+        print('{0:<7s} {1:<6s} {2:<8s}'.format(
+            taskID[1:], task['model']['name'], task['state']
         ))
 
-def print_task(i):
-    db = get_db().get()
-    if not i in range(len(db)):
-        print('Task {} does not exists.'.format(i))
+def printTask(taskID):
+    if not 't{}'.format(taskID) in db.reference('/task').get().keys():
+        print('Task {} does not exists.'.format(taskID))
         return
-    task = db[i]
-    print('Task ID       {}'.format(i))
+    task = db.reference('/task/t{}'.format(taskID)).get()
+    print('Task ID       {}'.format(taskID))
+    print('Task model    {}'.format(task['model']['name']))
     print('Task status   {}'.format(task['state']))
     if 'metrics' in task.keys():
         print('Eval metrics  {}'.format(task['metrics']))
@@ -45,12 +44,14 @@ if __name__ == '__main__':
         help='get status of specific task')
     args = parser.parse_args()
 
+    initFirebase()
+
     if args.reset:
-        reset_db()
+        resetDB()
 
     if args.state:
-        list_all_tasks()
+        listAllTasks()
 
     if args.t:
-        print_task(args.t)
+        printTask(args.t)
         

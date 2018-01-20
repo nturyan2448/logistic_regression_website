@@ -32,17 +32,23 @@ class App extends Component {
       if (this.state.isFree) {
         console.log('checking tasks to do...');
         db.ref('task').once('value').then((snapshot) => {
-          const taskIndex = snapshot.val().findIndex((item) => item.state === 'queued')
-          if (taskIndex !== -1) {
+          for (var taskID in snapshot.val()) {
+            if (snapshot.val()[taskID].state == 'queued') {
+              return taskID;
+            }
+          }
+          return -1;
+        }).then((taskID) => {
+          if (taskID !== -1) {
             // get task and start training
             this.setState({ 'isFree': false });
-            db.ref('task/' + taskIndex).update({ 'state': 'training' });
-            db.ref('task/' + taskIndex).once('value').then((snapshot) => {
+            db.ref('task/' + taskID).update({ 'state': 'training' });
+            db.ref('task/' + taskID).once('value').then((snapshot) => {
               const { data } = snapshot.val();
-              const { model, metrics } = this.LR(data);
-              db.ref('task/' + taskIndex).update({ 
+              const { result, metrics } = this.LR(data);
+              db.ref('task/' + taskID).update({ 
                 'state': 'done',
-                'model': model,
+                'result': result,
                 'metrics': metrics
               });
               this.setState({ 'isFree': true });
@@ -129,7 +135,7 @@ class App extends Component {
     })
 
     return {
-      'model': w,
+      'result': w,
       'metrics': { 'error': error }
     }
   }
