@@ -10,8 +10,9 @@ def initFirebase():
         'databaseURL': 'https://mljs-85ca7.firebaseio.com/'
     })
 
-def resetDB():
-    data = json.load(open('data.json'))
+def resetDB(dbInitFile):
+    data = json.load(open(dbInitFile))
+    db.reference('/').delete()    
     db.reference('/task').set(data['task'])
     db.reference('/global').set(data['global'])
 
@@ -40,6 +41,7 @@ def addTask(taskFile='newData.json'):
     data = json.load(open(taskFile))
     data['state'] = 'queued'
     db.reference('/task/t{}'.format(currentTaskCount + 1)).set(data)
+    db.reference('/global/taskCount').set(currentTaskCount + 1)
     
 
 if __name__ == '__main__':
@@ -50,14 +52,14 @@ if __name__ == '__main__':
         help='list all tasks')
     parser.add_argument('-t', type=int, metavar='taskID',
         help='get status of specific task')
-    parser.add_argument('-a', metavar='filename', default='newData.json',
+    parser.add_argument('-a', metavar='filename',
         help='add new task with task description JSON file')
     args = parser.parse_args()
 
     initFirebase()
 
     if args.reset:
-        resetDB()
+        resetDB('data.json')
 
     if args.state:
         listAllTasks()
