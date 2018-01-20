@@ -2,14 +2,31 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import fetch from 'isomorphic-fetch';
 import IrisDataset from 'ml-dataset-iris';
+import firebase from 'firebase';
 import {RandomForestClassifier} from 'ml-random-forest';
 import './App.css';
 
+var config = {
+  apiKey: "AIzaSyBphC2LAI6EhpG9h3C3Lvief6_ZyQHGPX4",
+  authDomain: "mljs-ed613.firebaseapp.com",
+  databaseURL: "https://mljs-ed613.firebaseio.com",
+  projectId: "mljs-ed613",
+  storageBucket: "",
+  messagingSenderId: "444202496736"
+};
+var fire = firebase.initializeApp(config);
+var db = fire.database();
+
 class App extends Component {
   componentDidMount() {
-    this.RF()
+    // get training and testing data from database
+    db.ref('data').once('value').then((snapshot) => {
+      const data = snapshot.val();
+      this.LR(data);
+    });
   }
-  LR() {
+
+  LR(data) {
     function f(w,x) { //array w, array x (single data)
         sum = 0;
         for (let i = 0; i < w.length; i++) {
@@ -41,10 +58,7 @@ class App extends Component {
         return w;
     }
 
-    const x_test = []
-    const x_train = [[]]
-    const y_test = []
-    const y_train = [[]]
+    const { x_train, y_train, x_test, y_test } = data;
 
     console.log('=================================')
     console.log('       Logistic_Regression       ')
@@ -95,7 +109,8 @@ class App extends Component {
       })
     })
   }
-  RF() {
+
+  RF(data) {
     console.log('=================================')
     console.log('       Logistic_Regression       ')
     console.log('=================================')
