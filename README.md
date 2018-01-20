@@ -3,7 +3,7 @@ NMLAB Final Project
 
 ## Introduction
 
-#### Machine Learning Website： React
+#### Machine Learning Website: React
 將我們想要進行的machine learning任務放到雲端上，並使用連進此網站user的CPU資源來幫助我們進行machine learning。
 
 #### Database： Firebase
