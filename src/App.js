@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import fetch from 'isomorphic-fetch';
-import IrisDataset from 'ml-dataset-iris';
 import firebase from 'firebase';
 import {RandomForestClassifier} from 'ml-random-forest';
 import './App.css';
@@ -28,12 +27,12 @@ class App extends Component {
   componentDidMount() {
     // task manager
     setInterval(() => {
-      console.log(this.state);
       if (this.state.isFree) {
         console.log('checking tasks to do...');
         db.ref('task').once('value').then((snapshot) => {
           for (var taskID in snapshot.val()) {
-            if (snapshot.val()[taskID].state == 'queued') {
+            const taskState = snapshot.val()[taskID].state;
+            if (taskState === 'queued' || taskState === 'canParallel') {
               return taskID;
             }
           }
@@ -42,14 +41,33 @@ class App extends Component {
           if (taskID !== -1) {
             // get task and start training
             this.setState({ 'isFree': false });
-            db.ref('task/' + taskID).update({ 'state': 'training' });
-            db.ref('task/' + taskID).once('value').then((snapshot) => {
-              const { data } = snapshot.val();
-              const { result, metrics } = this.LR(data);
-              db.ref('task/' + taskID).update({ 
-                'state': 'done',
-                'result': result,
-                'metrics': metrics
+            db.ref('task/'+taskID).once('value').then((snapshot) => {
+              const { model, data } = snapshot.val();
+              const { result, metrics } = ((model, data) => {
+                switch (model.name) {
+                  case "LR": 
+                    db.ref('task/'+taskID).update({ 'state': 'training' });
+                    return this.LR(data);
+                  case "RF": 
+                    const leftCount = model.count - 25;
+                    const updateState = {
+                      'state': leftCount > 0 ? 'canParallel' : 'training',
+                      'model': {
+                        'name': model.name,
+                        'count': leftCount
+                      } 
+                    }
+                    db.ref('task/'+taskID).update(updateState);
+                    return this.RF(data);
+              }})(model, data);
+              const d = new Date().getTime()
+              db.ref('task/'+taskID+'/result/id-'+d).set(result);
+              db.ref('task/'+taskID+'/metrics/id'+d).set(metrics);
+              db.ref('task/'+taskID).once('value').then((snapshot) => {
+                const { model } = snapshot.val();
+                db.ref('task/'+taskID).update({ 
+                  'state': (model.name == 'RF' && model.count > 0) ? 'canParallel' : 'done',
+                });
               });
               this.setState({ 'isFree': true });
             });
@@ -141,44 +159,46 @@ class App extends Component {
   }
 
   RF(data) {
+    const { x_train, y_train, x_test, y_test } = data;
+    
     console.log('=================================')
     console.log('       Logistic_Regression       ')
     console.log('=================================')
 
-    var trainingSet = IrisDataset.getNumbers();
-    var predictions = IrisDataset.getClasses().map(
-        (elem) => IrisDataset.getDistinctClasses().indexOf(elem)
-    );
+    const trainingSet = x_train;
+    const predictions = y_train;
+    const d = new Date().getTime() % 100;
 
-    var options = {
-        seed: 3,
+    const options = {
+        seed: d,
         maxFeatures: 0.8,
         replacement: true,
         nEstimators: 25
     };
 
-    var classifier = new RandomForestClassifier(options);
+    const classifier = new RandomForestClassifier(options);
+
     console.log('=================================')
     console.log('          Start training         ')
     console.log('=================================')
     classifier.train(trainingSet, predictions);
+
     console.log('=================================')
     console.log('          Start testing          ')
     console.log('=================================')
-    var result = classifier.predict(trainingSet);
-    console.log(result)
-    console.log(typeof result)
-    fetch('/result/rf', {
-      method: 'post',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-          result:result
-      })
-    })
+    const y_pred = classifier.predict(x_test);
+    
+    let match_count = 0;
+    for (let k = 0; k < y_test.length; k++) {
+      if (y_pred[k] == y_test[k]) match_count++;
+    }
+
+    return {
+      'result': JSON.stringify(classifier.toJSON()),
+      'metrics': { 'test_accuracy': match_count / y_test.length }
+    };
   }
+
   render() {
     return (
       <div className="App">

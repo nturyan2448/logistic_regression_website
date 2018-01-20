@@ -17,7 +17,7 @@ def resetDB():
 
 def listAllTasks():
     print('TaskID  Model  Status')
-    print('========================')
+    print('==========================')
     for taskID, task in sorted(db.reference('/task').get().items()):
         print('{0:<7s} {1:<6s} {2:<8s}'.format(
             taskID[1:], task['model']['name'], task['state']
@@ -33,6 +33,14 @@ def printTask(taskID):
     print('Task status   {}'.format(task['state']))
     if 'metrics' in task.keys():
         print('Eval metrics  {}'.format(task['metrics']))
+    #print(task['model'])
+
+def addTask(taskFile='newData.json'):
+    currentTaskCount = db.reference('/global/taskCount').get()
+    data = json.load(open(taskFile))
+    data['state'] = 'queued'
+    db.reference('/task/t{}'.format(currentTaskCount + 1)).set(data)
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Access to firebase database')
@@ -40,8 +48,10 @@ if __name__ == '__main__':
         help='reset database')
     parser.add_argument('--state', action='store_true',
         help='list all tasks')
-    parser.add_argument('-t', type=int,
+    parser.add_argument('-t', type=int, metavar='taskID',
         help='get status of specific task')
+    parser.add_argument('-a', metavar='filename', default='newData.json',
+        help='add new task with task description JSON file')
     args = parser.parse_args()
 
     initFirebase()
@@ -54,4 +64,7 @@ if __name__ == '__main__':
 
     if args.t:
         printTask(args.t)
+
+    if args.a:
+        addTask(args.a)
         
