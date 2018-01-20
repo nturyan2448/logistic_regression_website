@@ -17,6 +17,7 @@
   },
   "proxy": "http://localhost:3001/",
   "scripts": {
+    "heroku-postbuild": "webpack -p --config ./webpack.prod.config.js --progress",
     "start": "npm run client",
     "client": "react-scripts start",
     "build": "webpack",
