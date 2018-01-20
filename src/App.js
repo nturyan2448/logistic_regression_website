@@ -7,12 +7,12 @@ import {RandomForestClassifier} from 'ml-random-forest';
 import './App.css';
 
 var config = {
-  apiKey: "AIzaSyBphC2LAI6EhpG9h3C3Lvief6_ZyQHGPX4",
-  authDomain: "mljs-ed613.firebaseapp.com",
-  databaseURL: "https://mljs-ed613.firebaseio.com",
-  projectId: "mljs-ed613",
+  apiKey: "AIzaSyArkniv60Lq__oV5lEbVmydEbzBodA1F0U",
+  authDomain: "mljs-85ca7.firebaseapp.com",
+  databaseURL: "https://mljs-85ca7.firebaseio.com",
+  projectId: "mljs-85ca7",
   storageBucket: "",
-  messagingSenderId: "444202496736"
+  messagingSenderId: "449983097271"
 };
 var fire = firebase.initializeApp(config);
 var db = fire.database();
