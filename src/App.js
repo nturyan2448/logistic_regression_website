@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import fetch from 'isomorphic-fetch';
 import firebase from 'firebase';
 import {RandomForestClassifier} from 'ml-random-forest';
 import './App.css';
@@ -139,18 +138,6 @@ class App extends Component {
     // console.log('# of test cases = ' + y_test.length)
     var error = sum / y_test.length
     console.log('Error = ' + error);
-
-    fetch('/result/lr', {
-      method: 'post',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-          weight: w,
-          error: error
-      })
-    })
 
     return {
       'result': w,
