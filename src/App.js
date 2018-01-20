@@ -26,6 +26,7 @@ class App extends Component {
   }
 
   componentDidMount() {
+    // task manager
     setInterval(() => {
       console.log(this.state);
       if (this.state.isFree) {
@@ -33,6 +34,7 @@ class App extends Component {
         db.ref('task').once('value').then((snapshot) => {
           const taskIndex = snapshot.val().findIndex((item) => item.state === 'queued')
           if (taskIndex !== -1) {
+            // get task and start training
             this.setState({ 'isFree': false });
             db.ref('task/' + taskIndex).update({ 'state': 'training' });
             db.ref('task/' + taskIndex).once('value').then((snapshot) => {
@@ -60,14 +62,6 @@ class App extends Component {
         return 1/(1+Math.exp(-sum)); //logistic regression
         // return sum; //linear regression
     }
-    
-    // function L(f,y) {
-    //     sum = 0
-    //     for (let i = 0; i < f.length; i++) {
-    //         sum -= (y[i]*log(f[i]) + (1-y[i])*log(1-f[i]))
-    //     }
-    //     return sum
-    // }
     
     function regression(w,y,x,b){ // full data
         for (let i = 0; i < w.length + 1; i++){
